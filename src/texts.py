@@ -4,7 +4,6 @@ from typing import Union
 from langchain_community.chat_models import ChatOpenAI
 from langchain.schema import HumanMessage
 from langchain.memory import ConversationSummaryMemory
-from langchain.chains.conversation.base import ConversationChain
 
 from src import Elements
 
@@ -25,12 +24,11 @@ class Texts(Elements):
 
     def generate_texts_for_slides(self):
         memory = ConversationSummaryMemory(llm=LLM, return_messages=True)
-        conversation = ConversationChain(llm=LLM, memory=memory, verbose=True)
 
         for i in range(len(self.slides)):
-            self.generate_text_for_slide(conversation, i)
+            self.generate_text_for_slide(memory, i)
     
-    def generate_text_for_slide(self, conversation: ConversationChain, index: int):
+    def generate_text_for_slide(self, memory: ConversationSummaryMemory, index: int):
         if os.path.exists(self[index]):
             return
         base64_str = self.slides.get_base64(index)
@@ -48,11 +46,15 @@ class Texts(Elements):
         ]
 
         human_message = HumanMessage(content=prompt)
-        response = LLM.invoke([human_message]).content
-        # response = conversation.predict(input=human_message)
+
+        full_chat = memory.chat_memory.messages + [human_message]
+
+        response = LLM.invoke(full_chat)
+
+        memory.chat_memory.add_ai_message(response)
 
         with open(self[index], "w") as file:
-            file.write(response)
+            file.write(response.content)
 
     def get_slide_prompt(self, index: int):
         if index == 0:
