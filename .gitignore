@@ -2,6 +2,7 @@
 *.json
 *.jpg
 *.txt
+*.mp4
 
 test.ipynb
 
