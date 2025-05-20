@@ -1,0 +1,14 @@
+*.pdf
+*.json
+*.jpg
+*.txt
+
+test.ipynb
+
+.env
+
+__pycache__/
+projects/
+venv/
+Wav2Lip/
+tortoise-tts/
