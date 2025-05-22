@@ -1,0 +1,14 @@
+* {
+    box-sizing: border-box;
+}
+
+.tooltip {
+    position: absolute;
+    background: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    display: none;
+    z-index: 1000;
+}
