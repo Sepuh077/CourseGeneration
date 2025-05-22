@@ -20,7 +20,7 @@ class VideoCourse(models.Model):
         return os.path.join(settings.MEDIA_URL, PROJECT_FOLDER, self.folder, RESULT_MP4) if os.path.exists(path) else None
 
 
-class Voices(models.Model):
+class Voice(models.Model):
     voice_id = models.CharField(max_length=32, unique=True)
     name = models.CharField(max_length=32)
     avatar = models.TextField()
