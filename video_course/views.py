@@ -1,0 +1,51 @@
+from django.shortcuts import render, redirect
+
+from src import VideoCourse, Slides, Texts
+from .models import VideoCourse as VC
+
+# Create your views here.
+def upload_slides(request):
+    if request.method == "POST":
+        VC.objects.all().delete()
+        document = request.FILES['document']
+        name = request.POST['name']
+
+        video_course = VideoCourse(name)
+
+        vc = VC.objects.create(
+            title=name,
+            folder=video_course.folder_name
+        )
+        Slides(video_course.folder, document.read())
+        vc.images_created = True
+        vc.save()
+
+        return redirect('process', key=vc.folder)
+    
+    return render(request, "video_course/upload.html")
+
+
+def process_video_course(request, key):
+    context = {
+        'data': []
+    }
+
+    vc = VC.objects.get(folder=key)
+    if request.method == "GET":
+        context['video_path'] = vc.get_video_path()
+        if not context['video_path']:
+            video_course = VideoCourse(vc.folder, True)
+            slides = Slides(video_course.folder)
+            texts = Texts(video_course.folder, slides)
+
+            for i in range(len(slides)):
+                context['data'].append({
+                    'image': slides.relpath(i),
+                    'text': texts.get(i)
+                })
+
+            context['images_created'] = vc.images_created
+            context['texts_created'] = vc.texts_created
+            context['audio_created'] = vc.audios_created
+
+    return render(request, "video_course/process.html", context=context)
