@@ -16,7 +16,8 @@ class VideoCourse:
     
     def set_project_path(self, name: str, exists_ok: bool):
         folder = os.path.join(settings.MEDIA_ROOT, PROJECT_FOLDER)
-        name = re.sub(r'[^\w]', '', name, flags=re.UNICODE)
+        if not exists_ok:
+            name = re.sub(r'[^\w]', '', name, flags=re.UNICODE)
         project_path = os.path.join(folder, name)
 
         if not exists_ok:

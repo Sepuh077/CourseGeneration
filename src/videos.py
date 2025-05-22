@@ -6,8 +6,8 @@ from src.constants import BASE_DIR
 
 
 class Videos(Elements):
-    def __init__(self, project_path: str, audios: Elements, prof_path: str):
-        super().__init__(project_path, "videos", "mp4")
+    def __init__(self, video_course, audios: Elements, prof_path: str):
+        super().__init__(video_course, "videos", "mp4")
 
         self.audios = audios
         self.checkpoint_path = os.path.join(BASE_DIR, "Wav2Lip/checkpoints/wav2lip_gan.pth")

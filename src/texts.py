@@ -12,8 +12,8 @@ LLM = ChatOpenAI(model="gpt-4.1", temperature=0.7, max_tokens=180)
 
 
 class Texts(Elements):
-    def __init__(self, project_path: str, slides: Elements, data: Union[str, list, None] = None):
-        super().__init__(project_path, "texts", "txt")
+    def __init__(self, video_course, slides: Elements, data: Union[str, list, None] = None):
+        super().__init__(video_course, "texts", "txt")
         
         self.slides = slides
         self.data = data
@@ -23,7 +23,7 @@ class Texts(Elements):
         memory = ConversationSummaryMemory(llm=LLM, return_messages=True)
 
         for i in range(len(self.slides)):
-            self.generate_text_for_slide(memory, i)
+            self.generate_text_for_slide(memory, i, send_msg=True)
     
     def regenerate_text(self, index: int):
         if index >= len(self):
@@ -32,9 +32,9 @@ class Texts(Elements):
 
         for i in range(index):
             self.generate_text_for_slide(memory, i)
-        self.generate_text_for_slide(memory, index, overwrite=True)
+        return self.generate_text_for_slide(memory, index, overwrite=True)
     
-    def generate_text_for_slide(self, memory: ConversationSummaryMemory, index: int, overwrite: bool = False):
+    def generate_text_for_slide(self, memory: ConversationSummaryMemory, index: int, overwrite: bool = False, send_msg: bool = False):
         if os.path.exists(self[index]) and not overwrite:
             text = self.get(index)
             if text:
@@ -63,15 +63,41 @@ class Texts(Elements):
 
         memory.chat_memory.add_ai_message(response)
 
-        self.write(index, response.content)
+        return self.write(index, response.content, send_msg)
+
+    def generate_text_for_slide_without_memory(self, index: int, overwrite: bool = False):
+        if os.path.exists(self[index]) and not overwrite:
+            return
+        base64_str = self.slides.get_base64(index)
+        prompt = [
+            {
+                "type": "text", 
+                "text": self.get_slide_prompt(-1)
+            },
+            {
+                "type": "image_url", 
+                "image_url": {
+                    "url": f"data:image/jpeg;base64,{base64_str}"
+                }
+            },
+        ]
+
+        human_message = HumanMessage(content=prompt)
+
+        response = LLM.invoke([human_message])
+
+        return self.write(index, response.content)
 
     def get_slide_prompt(self, index: int):
+        """
+        To get the default prompt (for middle pages) index = -1 can be assigned
+        """
         if index == 0:
-            return "Imagine you are a university professor starting a lecture. Introduce the topic clearly and engagingly in under 150 tokens without cutting off mid-sentence and return only speakable text"
+            return "Imagine you are a university presenter starting a lecture. Introduce the topic clearly and engagingly in under 150 tokens without cutting off mid-sentence and return only speakable text"
         elif index == len(self.slides) - 1:
-            return "As a professor concluding the lecture, summarize the key points and encourage students to explore further in under 150 tokens without cutting off mid-sentence"
+            return "As a presenter concluding the lecture, summarize the key points and encourage students to explore further in under 150 tokens without cutting off mid-sentence"
         else:
-            return "As a professor, provide detailed but understandable content, return only speakable text in under 150 tokens without cutting off mid-sentence"
+            return "As a presenter, provide detailed but understandable content of this slide, return only speakable text in under 150 tokens without cutting off mid-sentence"
 
     def check_data(self):
         if not self.data:
@@ -93,9 +119,14 @@ class Texts(Elements):
         for index, text in enumerate(self.data):
             self.write(index, text)
     
-    def write(self, index: int, text: str):
+    def write(self, index: int, text: str, send_msg: bool = False):
+        text = text.strip()
+        if send_msg:
+            self.send_message(text, index)
         with open(self[index], "w") as file:
-            file.write(text.strip())
+            file.write(text)
+        
+        return text
 
     def get(self, index: int):
         if os.path.exists(self[index]):

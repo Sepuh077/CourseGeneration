@@ -7,8 +7,8 @@ from src import Elements
 
 
 class Slides(Elements):
-    def __init__(self, project_path: str, document: Union[str, bytes, None] = None):
-        super().__init__(project_path, "images", "jpg")
+    def __init__(self, video_course, document: Union[str, bytes, None] = None):
+        super().__init__(video_course, "images", "jpg")
 
         if document:
             self.seperate_images(document)

@@ -17,7 +17,7 @@ def upload_slides(request):
             title=name,
             folder=video_course.folder_name
         )
-        Slides(video_course.folder, document.read())
+        Slides(video_course, document.read())
         vc.images_created = True
         vc.save()
 
@@ -34,8 +34,8 @@ def process_video_course(request, key):
     vc = VC.objects.get(folder=key)
     if request.method == "GET":
         video_course = VideoCourse(vc.folder, True)
-        slides = Slides(video_course.folder)
-        texts = Texts(video_course.folder, slides)
+        slides = Slides(video_course)
+        texts = Texts(video_course, slides)
 
         for i in range(len(slides)):
             context['data'].append({

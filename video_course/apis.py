@@ -10,8 +10,8 @@ def generate_texts(request, key: str):
     if request.method == "POST":
         vc = VC.objects.get(folder=key)
         video_course = VideoCourse(vc.folder, True)
-        slides = Slides(video_course.folder)
-        texts = Texts(video_course.folder, slides)
+        slides = Slides(video_course)
+        texts = Texts(video_course, slides)
         texts.generate_texts_for_slides()
         vc.texts_created = True
         vc.save()
@@ -24,9 +24,9 @@ def regenerate_text(request, key: str, index: int):
     if request.method == "POST":
         vc = VC.objects.get(folder=key)
         video_course = VideoCourse(vc.folder, True)
-        slides = Slides(video_course.folder)
-        texts = Texts(video_course.folder, slides)
-        texts.regenerate_text(index)
+        slides = Slides(video_course)
+        texts = Texts(video_course, slides)
+        context["text"] = texts.regenerate_text(index)
         vc.texts_created = True
         vc.save()
     
@@ -39,8 +39,8 @@ def update_texts(request, key: str):
         data = json.loads(request.POST['data'])
         vc = VC.objects.get(folder=key)
         video_course = VideoCourse(vc.folder, True)
-        slides = Slides(video_course.folder)
-        Texts(video_course.folder, slides, data)
+        slides = Slides(video_course)
+        Texts(video_course, slides, data)
         vc.texts_created = True
         vc.save()
     
@@ -57,9 +57,9 @@ def generate_video(request, key: str):
 
         video_course = VideoCourse(vc.folder, True)
 
-        slides = Slides(video_course.folder)
-        texts = Texts(video_course.folder, slides, data)
-        audios = Audios(video_course.folder, texts, voice_name)
+        slides = Slides(video_course)
+        texts = Texts(video_course, slides, data)
+        audios = Audios(video_course, texts, voice_name)
         
         vc.audios_created = True
         vc.save()

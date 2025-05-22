@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    "video_course"
+    "video_course",
+    "authentication"
 ]
 
 MIDDLEWARE = [
@@ -96,6 +97,7 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'authentication.Profile'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
