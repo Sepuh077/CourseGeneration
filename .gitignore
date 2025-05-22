@@ -3,12 +3,14 @@
 *.jpg
 *.txt
 *.mp4
+*.sqlite3
 
 test.ipynb
 
 .env
 
 __pycache__/
+migrations/
 projects/
 venv/
 Wav2Lip/
