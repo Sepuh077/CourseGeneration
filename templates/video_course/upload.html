@@ -1,0 +1,32 @@
+{% extends '../base.html' %}
+{% load i18n %}
+
+{% block title %}
+{% endblock title %}
+
+{% block head %}
+{% endblock head %}
+
+{% block content %}
+<div class="content">
+    <form method="POST" enctype="multipart/form-data">
+        <input name="name">
+        <label for="upload-document-input" class="upload-document-container" id="upload-document-container">
+            <div class="upload-document-container-2">
+                <div class="drag-drop-text">
+                    {% trans 'Drop your file here...' %}
+                </div>
+                {% csrf_token %}
+                <input type="file" accept="application/pdf" name="document" style="display: none;" id="upload-document-input">
+                <div class="upload-document-element">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    {% trans 'Choose a document' %}
+                </div>
+                <span id="file-upload-filename" class="file-upload-filename">{% trans 'No file chosen' %}</span>
+            </div>
+        </label>
+        <button type="submit">Submit</button>
+    </form>
+</div>
+<script src="/static/js/video_course/upload.js"></script>
+{% endblock content %}
