@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponse
+from django.http.response import Http404
 
 from src import VideoCourse, Slides, Texts
 from .models import VideoCourse as VC
@@ -32,20 +33,31 @@ def process_video_course(request, key):
 
     vc = VC.objects.get(folder=key)
     if request.method == "GET":
+        video_course = VideoCourse(vc.folder, True)
+        slides = Slides(video_course.folder)
+        texts = Texts(video_course.folder, slides)
+
+        for i in range(len(slides)):
+            context['data'].append({
+                'image': slides.relpath(i),
+                'text': texts.get(i)
+            })
+
+        context['images_created'] = vc.images_created
+        context['texts_created'] = vc.texts_created
+        context['audio_created'] = vc.audios_created
+        context['video_path'] = vc.get_video_path()
+
+    return render(request, "video_course/process.html", context=context)
+
+
+def show_video(request, key):
+    context = {}
+
+    vc = VC.objects.get(folder=key)
+    if request.method == "GET":
         context['video_path'] = vc.get_video_path()
         if not context['video_path']:
-            video_course = VideoCourse(vc.folder, True)
-            slides = Slides(video_course.folder)
-            texts = Texts(video_course.folder, slides)
-
-            for i in range(len(slides)):
-                context['data'].append({
-                    'image': slides.relpath(i),
-                    'text': texts.get(i)
-                })
-
-            context['images_created'] = vc.images_created
-            context['texts_created'] = vc.texts_created
-            context['audio_created'] = vc.audios_created
+            return Http404()
 
     return render(request, "video_course/process.html", context=context)

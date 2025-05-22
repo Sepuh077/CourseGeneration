@@ -21,7 +21,7 @@ if __name__ == "__main__":
     video_course = VideoCourse(args.name, args.exists_ok)
 
     slides = Slides(video_course.folder, args.document)
-    texts = Texts(video_course.folder, slides, args.data)
+    texts = Texts(video_course.folder, slides, args.data, args.data == None)
     audios = Audios(video_course.folder, texts, args.voice)
 
     if args.wav2lip:
