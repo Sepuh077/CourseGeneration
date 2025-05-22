@@ -25,7 +25,7 @@ class Videos(Elements):
             self.generate_video(index)
 
     def generate_video(self, index: int):
-        if os.path.exists(self[index]):
+        if os.path.exists(self[index]) or not os.path.exists(self.audios[index]):
             return
         command = f"python {os.path.join(BASE_DIR, 'Wav2Lip/inference.py')} --checkpoint_path {self.checkpoint_path} --face {self.image} --audio {self.audios[index]} --outfile {self[index]} --face_det_batch_size 4"
         subprocess.run(command, shell=True)

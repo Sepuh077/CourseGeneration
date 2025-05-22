@@ -1,7 +1,10 @@
 import os
+import re
+from pathlib import Path
+from django.conf import settings
 from moviepy import VideoFileClip, ImageClip, CompositeVideoClip, concatenate_videoclips, AudioFileClip
 
-from src.constants import BASE_DIR
+from src.constants import PROJECT_FOLDER, RESULT_MP4
 from src import Elements
 
 
@@ -9,9 +12,11 @@ class VideoCourse:
     def __init__(self, name: str, exists_ok: bool = False):
         self.name = name
         self.folder = self.set_project_path(name, exists_ok)
+        self.folder_name = Path(self.folder).name
     
     def set_project_path(self, name: str, exists_ok: bool):
-        folder = os.path.join(BASE_DIR, "projects")
+        folder = os.path.join(settings.MEDIA_ROOT, PROJECT_FOLDER)
+        name = re.sub(r'[^\w]', '', name, flags=re.UNICODE)
         project_path = os.path.join(folder, name)
 
         if not exists_ok:
@@ -31,12 +36,16 @@ class VideoCourse:
                 )
             )
 
-        result_path = os.path.join(self.folder, "result.mp4")
+        result_path = os.path.join(self.folder, RESULT_MP4)
+
+        videoclips = list(filter(lambda x: x, videoclips))
         concatenate_videoclips(videoclips).write_videofile(result_path)
 
         return result_path
     
     def combine_slide_and_media(self, image_path: str, media_path: str):
+        if not os.path.exists(media_path):
+            return
         if media_path.endswith("wav"):
             return self.combine_slide_and_audio(image_path, media_path)
         elif media_path.endswith("mp4"):

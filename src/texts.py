@@ -1,26 +1,23 @@
 import os
 import json
 from typing import Union
-from langchain_community.chat_models import ChatOpenAI
 from langchain.schema import HumanMessage
 from langchain.memory import ConversationSummaryMemory
+from langchain_openai import ChatOpenAI
 
 from src import Elements
 
 
-LLM = ChatOpenAI(model="gpt-4.1", max_tokens=1000)
+LLM = ChatOpenAI(model="gpt-4.1", temperature=0.7, max_tokens=180)
 
 
 class Texts(Elements):
-    def __init__(self, project_path: str, slides: Elements, data: Union[str, list, None]):
+    def __init__(self, project_path: str, slides: Elements, data: Union[str, list, None] = None):
         super().__init__(project_path, "texts", "txt")
         
         self.slides = slides
-        self.generate_text = data == None
         self.data = data
         self.check_data()
-        if self.generate_text:
-            self.generate_texts_for_slides()
 
     def generate_texts_for_slides(self):
         memory = ConversationSummaryMemory(llm=LLM, return_messages=True)
@@ -28,9 +25,22 @@ class Texts(Elements):
         for i in range(len(self.slides)):
             self.generate_text_for_slide(memory, i)
     
-    def generate_text_for_slide(self, memory: ConversationSummaryMemory, index: int):
-        if os.path.exists(self[index]):
+    def regenerate_text(self, index: int):
+        if index >= len(self):
+            raise IndexError("Index is out of range!")
+        memory = ConversationSummaryMemory(llm=LLM, return_messages=True)
+
+        for i in range(index):
+            self.generate_text_for_slide(memory, i)
+        self.generate_text_for_slide(memory, index, overwrite=True)
+    
+    def generate_text_for_slide(self, memory: ConversationSummaryMemory, index: int, overwrite: bool = False):
+        if os.path.exists(self[index]) and not overwrite:
+            text = self.get(index)
+            if text:
+                memory.chat_memory.add_ai_message(text)
             return
+
         base64_str = self.slides.get_base64(index)
         prompt = [
             {
@@ -53,16 +63,15 @@ class Texts(Elements):
 
         memory.chat_memory.add_ai_message(response)
 
-        with open(self[index], "w") as file:
-            file.write(response.content)
+        self.write(index, response.content)
 
     def get_slide_prompt(self, index: int):
         if index == 0:
-            return "Imagine you are a university professor starting a lecture. Introduce the topic clearly and engagingly, return only speakable text"
+            return "Imagine you are a university professor starting a lecture. Introduce the topic clearly and engagingly in under 150 tokens without cutting off mid-sentence and return only speakable text"
         elif index == len(self.slides) - 1:
-            return "As a professor concluding the lecture, summarize the key points and encourage students to explore further, return only speakable text"
+            return "As a professor concluding the lecture, summarize the key points and encourage students to explore further in under 150 tokens without cutting off mid-sentence"
         else:
-            return "Provide detailed but understandable content, return only speakable text"
+            return "As a professor, provide detailed but understandable content, return only speakable text in under 150 tokens without cutting off mid-sentence"
 
     def check_data(self):
         if not self.data:
@@ -82,5 +91,14 @@ class Texts(Elements):
             raise ValueError("The size of slides and texts must be the same!")
         
         for index, text in enumerate(self.data):
-            with open(self[index], "w") as file:
-                file.write(text)
+            self.write(index, text)
+    
+    def write(self, index: int, text: str):
+        with open(self[index], "w") as file:
+            file.write(text.strip())
+
+    def get(self, index: int):
+        if os.path.exists(self[index]):
+            with open(self[index], "r") as file:
+                return file.read()
+        return ''

@@ -1,24 +1,29 @@
 import fitz
 import os
 import base64
+from typing import Union
 
 from src import Elements
 
 
 class Slides(Elements):
-    def __init__(self, project_path: str, document: str):
+    def __init__(self, project_path: str, document: Union[str, bytes, None] = None):
         super().__init__(project_path, "images", "jpg")
 
-        self.seperate_images(document)
+        if document:
+            self.seperate_images(document)
     
-    def seperate_images(self, document: str):
-        if document.endswith(".pdf"):
+    def seperate_images(self, document: Union[str, bytes]):
+        if (isinstance(document, str) and document.endswith(".pdf")) or isinstance(document, bytes):
             self.pdf_to_images(document)
         else:
             raise ValueError("The document file type should be PDF")
 
-    def pdf_to_images(self, document):
-        pdf_document = fitz.open(document)
+    def pdf_to_images(self, document: Union[str, bytes]):
+        if isinstance(document, bytes):
+            pdf_document = fitz.open(stream=document, filetype="pdf")
+        else:
+            pdf_document = fitz.open(document)
         
         for page_num in range(len(pdf_document)):
             page = pdf_document.load_page(page_num)
