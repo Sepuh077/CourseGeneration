@@ -40,3 +40,31 @@
     top: 2px;
     right: 6px;
 }
+
+.element-rotate-loading {
+    animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+    from {
+    transform: rotate(0deg);
+    }
+    to {
+    transform: rotate(360deg);
+    }
+}
+
+.generate-error {
+    background: none;
+    border: none;
+    width: min-content;
+}
+
+.generate-error, .regenerate-btn {
+    font-size: 18px;
+}
+
+.slide-actions {
+    display: flex;
+    gap: 4px;
+}

@@ -14,7 +14,7 @@ $(document).ready(function() {
                 tooltip.textContent = name;
 
                 const rect = button.getBoundingClientRect();
-                tooltip.style.left = rect.right + 10 + 'px';
+                tooltip.style.right = rect.left + 4 + 'px';
                 tooltip.style.top = rect.top + window.scrollY + 'px';
                 tooltip.style.display = 'block';
             }, 1000);

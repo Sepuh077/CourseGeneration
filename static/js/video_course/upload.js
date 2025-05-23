@@ -1,6 +1,7 @@
 $(document).ready(function() {
     const drop_area = document.getElementById('upload-document-container')
     const file_name_cnt = document.getElementById('file-upload-filename')
+    const file_upload = document.getElementById('upload-document-input')
 
     if(drop_area) {
         function handle_file(files) {

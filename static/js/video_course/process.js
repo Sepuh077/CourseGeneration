@@ -2,6 +2,8 @@ $(document).ready(function() {
     let parts = window.location.href.split('/')
     const roomName = parts[parts.length - 2]
     const typingSpeed = 40;
+    const element_rotate_loading_class = "element-rotate-loading"
+    const disabled = "disabled"
 
     const chatSocket = new WebSocket(
         'ws://'
@@ -30,7 +32,10 @@ $(document).ready(function() {
         let text = data.message
         let index = data.slide
 
-        let textarea = document.querySelectorAll(".slide-textarea")[index]
+        let cnt = document.querySelectorAll('.slide-text')[index]
+        let textarea = cnt.querySelector(".slide-textarea")
+        
+        show_regenerate_button(cnt)
 
         type_characters(textarea, text)
     };
@@ -39,7 +44,13 @@ $(document).ready(function() {
 
     document.querySelectorAll('.slide-text').forEach((element, index) => {
         $(element.querySelector('.regenerate-btn')).on('click', function() {
-            element.classList.add("disabled")
+            let btn = this
+            let icon = btn.querySelector('i')
+            let error = element.querySelector('.generate-error')
+            error.style.display = "none"
+            btn.classList.add(disabled)
+            icon.classList.add(element_rotate_loading_class)
+
             $.ajax({
                 method: "POST",
                 type: "POST",
@@ -51,20 +62,32 @@ $(document).ready(function() {
                     if(response.text) {
                         type_characters(element.querySelector("textarea"), response.text)
                     }
-                    element.classList.remove("disabled")
                 },
                 error: function(response) {
-                    element.classList.remove("disabled")
+                    error.style.display = "block"
+                },
+                complete: function() {
+                    btn.classList.remove(disabled)
+                    icon.classList.remove(element_rotate_loading_class)
                 }
             })
         })
     });
+
+    function show_regenerate_button(element) {
+        let regenerate_btn = element.querySelector('.regenerate-btn')
+        regenerate_btn.style.display = "block"
+    }
 
     function set_element_character_count(element) {
         let text = element.querySelector("textarea").value
 
         element.querySelector(".characters-count").textContent = text.length
         element.querySelector(".characters-max-count").textContent = CHARACTERS_MAX_COUNT
+
+        if(text.length > 0) {
+            show_regenerate_button(element)
+        }
     }
 
     function set_all_character_counts() {
@@ -85,6 +108,7 @@ $(document).ready(function() {
     })
 
     $('#generate-texts').on('click', function() {
+        this.classList.add(disabled)
         $.ajax({
             method: "POST",
             type: "POST",
@@ -94,6 +118,8 @@ $(document).ready(function() {
             },
             complete: function() {
                 // location.reload();
+                $('.second-step-buttons').show()
+                %(this).hide()
             }
         })
     })

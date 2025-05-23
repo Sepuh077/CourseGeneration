@@ -33,9 +33,14 @@
                     /
                     <span class="characters-max-count"></span>
                 </div>
-                <button class="regenerate-btn" data-name="Regenerate">
-                    <i class="fa-solid fa-rotate"></i>
-                </button>
+                <div class="slide-actions">
+                    <button class="regenerate-btn" data-name="Regenerate" {% if not texts_created %} style="display: none;" {% endif %}>
+                        <i class="fa-solid fa-rotate"></i>
+                    </button>
+                    <button class="generate-error" data-name="Something went wrong!" style="display: none;">
+                        <i class="fa-solid fa-circle-exclamation" style="color: #ff0000;"></i>
+                    </button>
+                </div>
             </div>
         </div>
         {% endfor %}
@@ -44,14 +49,15 @@
     <button id="generate-texts" data-name="Generate Texts">
         Generate texts
     </button>
-    {% else %}
-    <button id="update-texts" data-name="Update Texts">
-        Update texts
-    </button>
-    <button id="generate-video" data-name="Generate Video">
-        Generate video
-    </button>
     {% endif %}
+    <div class="second-step-buttons" {% if not texts_created %} style="display: none;" {% endif %}>
+        <button id="update-texts" data-name="Update Texts">
+            Update texts
+        </button>
+        <button id="generate-video" data-name="Generate Video">
+            Generate video
+        </button>
+    </div>
     {% endif %}
 </div>
 <script src="/static/js/video_course/process.js"></script>
