@@ -23,6 +23,26 @@ class Elements:
             }
         )
     
+    def send_skip_msg(self, index: int):
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f"project_{self.video_course.folder_name}",
+            {
+                "type": "send_skip_msg",
+                "slide": index
+            }
+        )
+    
+    def send_error_msg(self, index: int):
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f"project_{self.video_course.folder_name}",
+            {
+                "type": "send_error_msg",
+                "slide": index
+            }
+        )
+    
     def relpath(self, index: int):
         return os.path.join(settings.MEDIA_URL, os.path.relpath(self[index], settings.MEDIA_ROOT)).replace('\\', '/')
 

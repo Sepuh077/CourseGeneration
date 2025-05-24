@@ -1,6 +1,8 @@
 from django.http.response import JsonResponse
 import json
 
+from time import sleep
+
 from .models import VideoCourse as VC
 from src import Texts, VideoCourse, Slides, Audios
 
@@ -8,10 +10,11 @@ from src import Texts, VideoCourse, Slides, Audios
 def generate_texts(request, key: str):
     context = {}
     if request.method == "POST":
+        data = json.loads(request.POST.get("data", []))
         vc = VC.objects.get(folder=key)
         video_course = VideoCourse(vc.folder, True)
         slides = Slides(video_course)
-        texts = Texts(video_course, slides)
+        texts = Texts(video_course, slides, data)
         texts.generate_texts_for_slides()
         vc.texts_created = True
         vc.save()

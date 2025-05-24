@@ -9,7 +9,7 @@ def upload_slides(request):
     if request.method == "POST":
         VC.objects.all().delete()
         document = request.FILES['document']
-        name = request.POST['name']
+        name = request.POST.get("name") or ".".join(document.name.split('.')[:-1]) or "Project"
 
         video_course = VideoCourse(name)
 

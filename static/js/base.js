@@ -10,19 +10,25 @@ $(document).ready(function() {
         }
         button.addEventListener('mouseenter', (e) => {
             timeoutId = setTimeout(() => {
-                const name = button.getAttribute('data-name');
-                tooltip.textContent = name;
+                const name = button.getAttribute('data-name')
+                tooltip.textContent = name
+                tooltip.style.display = 'block'
 
-                const rect = button.getBoundingClientRect();
-                tooltip.style.right = rect.left + 4 + 'px';
-                tooltip.style.top = rect.top + window.scrollY + 'px';
-                tooltip.style.display = 'block';
-            }, 1000);
-        });
+                const rect = button.getBoundingClientRect()
+
+                const tooltip_rect = tooltip.getBoundingClientRect()
+
+                let tooltipWidth = tooltip_rect.width
+                let tooltipHeight = tooltip_rect.height
+
+                tooltip.style.left = rect.left + rect.width / 2 - tooltipWidth / 2 + 'px';
+                tooltip.style.top = rect.top + window.scrollY - tooltipHeight - 4 + 'px';
+            }, 1000)
+        })
 
         button.addEventListener('mouseleave', () => {
-            clearTimeout(timeoutId);
-            tooltip.style.display = 'none';
-        });
+            clearTimeout(timeoutId)
+            tooltip.style.display = 'none'
+        })
     });
 })

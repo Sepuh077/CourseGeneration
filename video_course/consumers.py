@@ -19,6 +19,24 @@ class GeneratedTextConsumer(WebsocketConsumer):
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name, self.channel_name
         )
+    
+    def send_error_msg(self, event):
+        slide = event["slide"]
+        self.send(
+            text_data=json.dumps({
+                "error": True,
+                "slide": slide
+            })
+        )
+    
+    def send_skip_msg(self, event):
+        slide = event["slide"]
+        self.send(
+            text_data=json.dumps({
+                "skip": True,
+                "slide": slide
+            })
+        )
 
     def send_generated_text(self, event):
         message = event["message"]

@@ -16,8 +16,7 @@ class Texts(Elements):
         super().__init__(video_course, "texts", "txt")
         
         self.slides = slides
-        self.data = data
-        self.check_data()
+        self.check_data(data)
 
     def generate_texts_for_slides(self):
         memory = ConversationSummaryMemory(llm=LLM, return_messages=True)
@@ -39,6 +38,8 @@ class Texts(Elements):
             text = self.get(index)
             if text:
                 memory.chat_memory.add_ai_message(text)
+            if send_msg:
+                self.send_skip_msg(index)
             return
 
         base64_str = self.slides.get_base64(index)
@@ -59,7 +60,11 @@ class Texts(Elements):
 
         full_chat = memory.chat_memory.messages + [human_message]
 
-        response = LLM.invoke(full_chat)
+        try:
+            response = LLM.invoke(full_chat)
+        except Exception as exc:
+            self.send_error_msg(index)
+            raise exc
 
         memory.chat_memory.add_ai_message(response)
 
@@ -99,25 +104,23 @@ class Texts(Elements):
         else:
             return "As a presenter, provide detailed but understandable content of this slide, return only speakable text in under 150 tokens without cutting off mid-sentence"
 
-    def check_data(self):
-        if not self.data:
+    def check_data(self, data):
+        if not data:
             return True
-        if isinstance(self.data, str):
-            if not os.path.exists(self.data):
+        if isinstance(data, str):
+            if not os.path.exists(data):
                 raise FileNotFoundError("The given data path is not found!")
-            elif not self.data.endswith(".json"):
+            elif not data.endswith(".json"):
                 raise ValueError("The data type must be json!")
             else:
-                with open(self.data, "r") as file:
-                    self.data = json.loads(file.read())
-        if not isinstance(self.data, list):
-            raise TypeError("Provided data type must be list or str, but received {}".format(type(self.data)))
+                with open(data, "r") as file:
+                    data = json.loads(file.read())
+        if not isinstance(data, list):
+            raise TypeError("Provided data type must be list or str, but received {}".format(type(data)))
         
-        if len(self.data) != len(self.slides):
-            raise ValueError("The size of slides and texts must be the same!")
-        
-        for index, text in enumerate(self.data):
-            self.write(index, text)
+        for index, text in enumerate(data):
+            if text:
+                self.write(index, text)
     
     def write(self, index: int, text: str, send_msg: bool = False):
         text = text.strip()

@@ -29,16 +29,39 @@ $(document).ready(function() {
 
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data)
-        let text = data.message
+
         let index = data.slide
-
         let cnt = document.querySelectorAll('.slide-text')[index]
-        let textarea = cnt.querySelector(".slide-textarea")
         
-        show_regenerate_button(cnt)
+        let text = data.message
+        
+        if(text) {
+            let textarea = cnt.querySelector(".slide-textarea")
 
-        type_characters(textarea, text)
+            type_characters(textarea, text)
+        }
+        show_generate_info(cnt, data.skip, data.error)
+        show_regenerate_button(cnt)
     };
+
+    function hide_generate_infos(element) {
+        element.querySelectorAll('.slide-generation-info').forEach(e => {
+            e.style.display = "none"
+        })
+    }
+
+    function show_generate_info(element, skip=false, error=false) {
+        hide_generate_infos(element)
+        if(error) {
+            element.querySelector('.generate-error').style.display = "block"
+        }
+        else if(skip) {
+            element.querySelector('.generate-skip').style.display = "block"
+        }
+        else {
+            element.querySelector('.generate-done').style.display = "block"
+        }
+    }
 
     const CHARACTERS_MAX_COUNT = 800
 
@@ -46,8 +69,7 @@ $(document).ready(function() {
         $(element.querySelector('.regenerate-btn')).on('click', function() {
             let btn = this
             let icon = btn.querySelector('i')
-            let error = element.querySelector('.generate-error')
-            error.style.display = "none"
+            hide_generate_infos(element)
             btn.classList.add(disabled)
             icon.classList.add(element_rotate_loading_class)
 
@@ -59,12 +81,11 @@ $(document).ready(function() {
                     "csrfmiddlewaretoken": CSRF,
                 },
                 success: function(response) {
-                    if(response.text) {
-                        type_characters(element.querySelector("textarea"), response.text)
-                    }
+                    type_characters(element.querySelector("textarea"), response.text)
+                    show_generate_info(element, false, false)
                 },
                 error: function(response) {
-                    error.style.display = "block"
+                    show_generate_info(element, false, true)
                 },
                 complete: function() {
                     btn.classList.remove(disabled)
@@ -114,12 +135,13 @@ $(document).ready(function() {
             type: "POST",
             url: "generate-texts/",
             data: {
-                "csrfmiddlewaretoken": CSRF
+                "csrfmiddlewaretoken": CSRF,
+                "data": JSON.stringify(get_texts())
             },
             complete: function() {
                 // location.reload();
                 $('.second-step-buttons').show()
-                %(this).hide()
+                $(this).hide()
             }
         })
     })

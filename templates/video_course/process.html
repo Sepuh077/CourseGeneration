@@ -37,9 +37,17 @@
                     <button class="regenerate-btn" data-name="Regenerate" {% if not texts_created %} style="display: none;" {% endif %}>
                         <i class="fa-solid fa-rotate"></i>
                     </button>
-                    <button class="generate-error" data-name="Something went wrong!" style="display: none;">
-                        <i class="fa-solid fa-circle-exclamation" style="color: #ff0000;"></i>
-                    </button>
+                    <div class="slide-generation-infos">
+                        <button class="generate-error slide-generation-info" data-name="Something went wrong!" style="display: none;">
+                            <i class="fa-solid fa-circle-exclamation" style="color: #ff0000;"></i>
+                        </button>
+                        <button class="generate-skip slide-generation-info" data-name="Skipped!" style="display: none;">
+                            <i class="fa-solid fa-circle-chevron-right" style="color: #74C0FC;"></i>
+                        </button>
+                        <button class="generate-done slide-generation-info" data-name="Done!" style="display: none;">
+                            <i class="fa-solid fa-circle-check" style="color: #00ff00;"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

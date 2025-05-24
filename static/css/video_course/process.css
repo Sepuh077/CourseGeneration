@@ -54,13 +54,13 @@
     }
 }
 
-.generate-error {
+.slide-generation-info {
     background: none;
     border: none;
     width: min-content;
 }
 
-.generate-error, .regenerate-btn {
+.slide-generation-info, .regenerate-btn {
     font-size: 18px;
 }
 
@@ -68,3 +68,15 @@
     display: flex;
     gap: 4px;
 }
+
+/* .generate-error {
+    background-color: red;
+}
+
+.generate-done {
+    background-color: green;
+}
+
+.generate-skip {
+    background-color: blue;
+} */
