@@ -80,3 +80,60 @@
 .generate-skip {
     background-color: blue;
 } */
+
+.popup {
+    width: 512px;
+    max-width: calc(100% - 32px);
+    height: 376px;
+    background-color: white;
+}
+
+.popup-cnt {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 100%;
+}
+
+.voice-selection-cnt {
+    position: relative;
+    height: 48px;
+    width: 256px;
+}
+
+.selected-voice {
+    height: 48px;
+}
+
+.selected-voice > img {
+    height: 44px;
+    width: 44px;
+    border-radius: 50%;
+}
+
+.voices {
+    width: 256px;
+    height: 128px;
+    overflow-y: auto;
+    position: absolute;
+    display: none;
+    top: 48px;
+}
+
+.voice, .selected-voice {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.voice > img {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+}
+
+.voice-name, .selected-voice-name {
+    font-size: 16px;
+}

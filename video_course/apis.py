@@ -1,10 +1,23 @@
 from django.http.response import JsonResponse
+from django.urls import reverse
 import json
 
 from time import sleep
 
-from .models import VideoCourse as VC
+from .models import VideoCourse as VC, Voice
 from src import Texts, VideoCourse, Slides, Audios
+
+
+def get_voices(request):
+    voices = []
+    if request.method == "GET":
+        for voice in Voice.objects.all():
+            voices.append({
+                "id": voice.voice_id,
+                "name": voice.name,
+                "avatar": voice.avatar
+            })
+    return JsonResponse({"voices": voices})
 
 
 def generate_texts(request, key: str):
@@ -53,7 +66,8 @@ def update_texts(request, key: str):
 def generate_video(request, key: str):
     context = {}
     if request.method == "POST":
-        voice_name = request.POST.get("voice_name", "william")
+        voice_id = request.POST.get("voice_id") or "william"
+
         data = json.loads(request.POST['data'])
 
         vc = VC.objects.get(folder=key)
@@ -62,11 +76,13 @@ def generate_video(request, key: str):
 
         slides = Slides(video_course)
         texts = Texts(video_course, slides, data)
-        audios = Audios(video_course, texts, voice_name)
+        audios = Audios(video_course, texts, voice_id)
         
         vc.audios_created = True
         vc.save()
 
         video_course.process(slides, audios)
+
+        context["link"] = reverse("show-video", kwargs={"key": key})
     
     return JsonResponse(context)

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import render, redirect
 from django.http.response import Http404
 
 from src import VideoCourse, Slides, Texts
@@ -60,4 +60,4 @@ def show_video(request, key):
         if not context['video_path']:
             return Http404()
 
-    return render(request, "video_course/process.html", context=context)
+    return render(request, "video_course/video.html", context=context)

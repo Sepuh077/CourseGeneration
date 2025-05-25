@@ -1,7 +1,7 @@
 from django.urls import path
 
-from .views import upload_slides, process_video_course
-from .apis import generate_texts, update_texts, generate_video, regenerate_text
+from .views import upload_slides, process_video_course, show_video
+from .apis import generate_texts, update_texts, generate_video, regenerate_text, get_voices
 
 
 urlpatterns = [
@@ -11,4 +11,6 @@ urlpatterns = [
     path('process/<str:key>/update-texts/', update_texts),
     path('process/<str:key>/generate-video/', generate_video),
     path('process/<str:key>/regenerate-text-<int:index>/', regenerate_text),
+    path('get-voices/', get_voices),
+    path('process/<str:key>/finished/', show_video, name="show-video")
 ]

@@ -13,35 +13,47 @@ class Elements:
         self.ext = ext
 
     def send_message(self, message: str, index: int):
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            f"project_{self.video_course.folder_name}",
-            {
-                "type": "send_generated_text",
-                "message": message,
-                "slide": index
-            }
-        )
+        try:
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                f"project_{self.video_course.folder_name}",
+                {
+                    "type": "send_generated_text",
+                    "message": message,
+                    "slide": index
+                }
+            )
+            return True
+        except Exception as exc:
+            return False
     
     def send_skip_msg(self, index: int):
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            f"project_{self.video_course.folder_name}",
-            {
-                "type": "send_skip_msg",
-                "slide": index
-            }
-        )
+        try:
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                f"project_{self.video_course.folder_name}",
+                {
+                    "type": "send_skip_msg",
+                    "slide": index
+                }
+            )
+            return True
+        except Exception as exc:
+            return False
     
     def send_error_msg(self, index: int):
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            f"project_{self.video_course.folder_name}",
-            {
-                "type": "send_error_msg",
-                "slide": index
-            }
-        )
+        try:
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                f"project_{self.video_course.folder_name}",
+                {
+                    "type": "send_error_msg",
+                    "slide": index
+                }
+            )
+            return True
+        except Exception as exc:
+            return False
     
     def relpath(self, index: int):
         return os.path.join(settings.MEDIA_URL, os.path.relpath(self[index], settings.MEDIA_ROOT)).replace('\\', '/')

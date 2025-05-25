@@ -11,15 +11,6 @@
 
 {% block content %}
 <div class="content">
-    {% if video_path %}
-    <video width="640" height="360" controls>
-        <source src="{{video_path}}" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-    <a href="{{video_path}}" download>
-        <button>Download Video</button>
-    </a>
-    {% else %}
     <div class="slides">
         {% for element in data %}
         <div class="slide" data-number="{{forloop.counter}}">
@@ -62,11 +53,27 @@
         <button id="update-texts" data-name="Update Texts">
             Update texts
         </button>
-        <button id="generate-video" data-name="Generate Video">
-            Generate video
+        <button id="choose-voice" data-name="Choose Voice">
+            Choose voice
         </button>
     </div>
-    {% endif %}
+    <div class="background" style="display: none;">
+        <div class="popup">
+            <div class="popup-cnt">
+                <div class="voice-selection-cnt" data-id="">
+                    <button class="selected-voice" data-id="" id="selected-voice">
+                        <img class="selected-voice-img" src="">
+                        <div class="selected-voice-name"></div>
+                    </button>
+                    <div class="voices">
+                    </div>
+                </div>
+                <button id="generate-video" data-name="Generate Video">
+                    Generate video
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 <script src="/static/js/video_course/process.js"></script>
 {% endblock content %}

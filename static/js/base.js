@@ -1,3 +1,21 @@
+const background = document.querySelector(".background")
+const body = document.querySelector("#body")
+
+function open_popup() {
+    if(background) {
+        background.style.display = "flex"
+        body.style.overflow = "hidden"
+        background.style.top = window.scrollY + "px"
+    }
+}
+
+function close_popup() {
+    if(background) {
+        background.style.display = "none"
+        body.style.overflow = "auto"
+    }
+}
+
 $(document).ready(function() {
     const buttons = document.querySelectorAll('button')
     const tooltip = document.getElementById('tooltip')

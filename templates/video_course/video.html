@@ -1,0 +1,21 @@
+{% extends '../base.html' %}
+{% load i18n %}
+
+{% block title %}
+{% endblock title %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/video_course/upload.css">
+{% endblock head %}
+
+{% block content %}
+<div class="content">
+    <video width="640" height="360" controls>
+        <source src="{{video_path}}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <a href="{{video_path}}" download>
+        <button>Download Video</button>
+    </a>
+</div>
+{% endblock content %}

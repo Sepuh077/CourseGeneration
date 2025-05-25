@@ -1,9 +1,12 @@
 $(document).ready(function() {
+    const selected_voice = document.getElementById("selected-voice")
     let parts = window.location.href.split('/')
     const roomName = parts[parts.length - 2]
     const typingSpeed = 40;
     const element_rotate_loading_class = "element-rotate-loading"
     const disabled = "disabled"
+    let start_generation = false
+    let sent_msg = false
 
     const chatSocket = new WebSocket(
         'ws://'
@@ -42,6 +45,7 @@ $(document).ready(function() {
         }
         show_generate_info(cnt, data.skip, data.error)
         show_regenerate_button(cnt)
+        sent_msg = true
     };
 
     function hide_generate_infos(element) {
@@ -129,7 +133,10 @@ $(document).ready(function() {
     })
 
     $('#generate-texts').on('click', function() {
+        start_generation = true
+        sent_msg = false
         this.classList.add(disabled)
+        let element = this
         $.ajax({
             method: "POST",
             type: "POST",
@@ -138,25 +145,42 @@ $(document).ready(function() {
                 "csrfmiddlewaretoken": CSRF,
                 "data": JSON.stringify(get_texts())
             },
-            complete: function() {
-                // location.reload();
+            success: function() {
                 $('.second-step-buttons').show()
-                $(this).hide()
+                $(element).hide()
+                if(!sent_msg) {
+                    location.reload()
+                }
+            },
+            error: function() {
+
+            },
+            complete: function() {
+                element.classList.remove(disabled)
             }
         })
     })
 
     $('#generate-video').on('click', function() {
+        let btn = this
+        btn.classList.add(disabled)
+        let voice_id = selected_voice.getAttribute("data-id")
         $.ajax({
             method: "POST",
             type: "POST",
             url: "generate-video/",
             data: {
                 "csrfmiddlewaretoken": CSRF,
-                "data": JSON.stringify(get_texts())
+                "data": JSON.stringify(get_texts()),
+                "voice_id": voice_id
+            },
+            success: function(response) {
+                if(response.link) {
+                    window.location.href = response.link
+                }
             },
             complete: function() {
-                // location.reload();
+                btn.classList.remove(disabled)
             }
         })
     })
@@ -176,7 +200,60 @@ $(document).ready(function() {
         })
     })
 
+    $("#choose-voice").on("click", open_popup)
+
     function get_texts() {
         return Array.from(document.querySelectorAll('.slides .slide textarea')).map(textarea => textarea.value)
     }
+
+    function load_voices() {
+        $.ajax({
+            method: "GET",
+            type: "GET",
+            url: "/get-voices/",
+            success: function(response) {
+                let voicesContainer = document.querySelector('.voices')
+                response.voices.forEach((voice, index) => {
+                    let button = document.createElement('button')
+                    button.className = 'voice'
+                    button.dataset.id = voice.id
+
+                    let img = document.createElement('img')
+                    img.src = voice.avatar
+                    img.loading = 'lazy'
+
+                    let nameDiv = document.createElement('div')
+                    nameDiv.className = 'voice-name'
+                    nameDiv.textContent = voice.name
+
+                    button.appendChild(img)
+                    button.appendChild(nameDiv)
+                    voicesContainer.appendChild(button)
+
+                    if(index == 0) {
+                        select_voice(button)
+                    }
+                })
+
+            }
+        })
+    }
+
+    load_voices()
+
+    function select_voice(element) {
+        let voice_cnt = selected_voice
+        voice_cnt.setAttribute("data-id", element.getAttribute("data-id"))
+        voice_cnt.querySelector("img").src = element.querySelector("img").src
+        voice_cnt.querySelector(".selected-voice-name").textContent = element.querySelector(".voice-name").textContent
+    }
+
+    selected_voice.onclick = function() {
+        $(".voices").toggle()
+    }
+
+    $(document).on("click", ".voice", function() {
+        select_voice(this)
+        $(".voices").hide()
+    })
 })
