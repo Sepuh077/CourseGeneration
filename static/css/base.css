@@ -20,7 +20,7 @@
 
 button:hover {
     opacity: 0.8;
-    cursor: pointer
+    cursor: pointer;
 }
 
 .background {
@@ -32,4 +32,20 @@ button:hover {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.popup {
+    position: relative;
+    border-radius: 8px;
+}
+
+.close-popup-icon {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: none;
+    border: none;
+    width: min-content;
+    height: min-content;
+    font-size: 16px;
 }

@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http.response import Http404
+from django.core.exceptions import ObjectDoesNotExist
 
 from src import VideoCourse, Slides, Texts
 from .models import VideoCourse as VC
@@ -31,7 +32,10 @@ def process_video_course(request, key):
         'data': []
     }
 
-    vc = VC.objects.get(folder=key)
+    try:
+        vc = VC.objects.get(folder=key)
+    except ObjectDoesNotExist as exc:
+        raise Http404("Page not found!")
     if request.method == "GET":
         video_course = VideoCourse(vc.folder, True)
         slides = Slides(video_course)
@@ -58,6 +62,6 @@ def show_video(request, key):
     if request.method == "GET":
         context['video_path'] = vc.get_video_path()
         if not context['video_path']:
-            return Http404()
+            raise Http404("Page not found!")
 
     return render(request, "video_course/video.html", context=context)

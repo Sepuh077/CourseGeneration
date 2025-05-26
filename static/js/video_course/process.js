@@ -1,5 +1,8 @@
 $(document).ready(function() {
     const selected_voice = document.getElementById("selected-voice")
+    const selected_audio_avatar_bg = document.getElementById("selected-voice-img-bg")
+    const selected_audio_avatar = document.getElementById("selected-voice-img-cnt")
+    const selected_audio_play_icon = selected_audio_avatar_bg.querySelector("i")
     let parts = window.location.href.split('/')
     const roomName = parts[parts.length - 2]
     const typingSpeed = 40;
@@ -7,6 +10,8 @@ $(document).ready(function() {
     const disabled = "disabled"
     let start_generation = false
     let sent_msg = false
+
+    let audio
 
     const chatSocket = new WebSocket(
         'ws://'
@@ -201,6 +206,7 @@ $(document).ready(function() {
     })
 
     $("#choose-voice").on("click", open_popup)
+    $('.close-popup-icon').on("click", close_popup)
 
     function get_texts() {
         return Array.from(document.querySelectorAll('.slides .slide textarea')).map(textarea => textarea.value)
@@ -245,10 +251,58 @@ $(document).ready(function() {
         let voice_cnt = selected_voice
         voice_cnt.setAttribute("data-id", element.getAttribute("data-id"))
         voice_cnt.querySelector("img").src = element.querySelector("img").src
-        voice_cnt.querySelector(".selected-voice-name").textContent = element.querySelector(".voice-name").textContent
+
+        let name = element.querySelector(".voice-name").textContent.trim()
+        voice_cnt.querySelector(".selected-voice-name").textContent = name
+
+        stop_audio()
+
+        audio = new Audio(`/static/voices/${name}.wav`)
+
+        audio.onerror = function(e) {
+            console.error('Audio load error');
+        };
+
+        audio.addEventListener('ended', function () {
+            selected_audio_play_icon.classList.remove("fa-pause")
+            selected_audio_play_icon.classList.add("fa-play")
+        });
     }
 
-    selected_voice.onclick = function() {
+    function stop_audio() {
+        if(audio && !audio.paused) {
+            audio.pause()
+            selected_audio_play_icon.classList.remove("fa-pause")
+            selected_audio_play_icon.classList.add("fa-play")
+        }
+    }
+
+    $(".selected-voice-img-cnt").on("click", function() {
+        if(audio) {
+            if (!audio.paused) {
+                audio.pause();
+                selected_audio_play_icon.classList.remove("fa-pause")
+                selected_audio_play_icon.classList.add("fa-play")
+            } else {
+                audio.play().then(() => {
+                    selected_audio_play_icon.classList.add("fa-pause")
+                    selected_audio_play_icon.classList.remove("fa-play")
+                }).catch(err => {
+                    console.error("Play error:", err);
+                });
+            }
+        }
+    })
+
+    selected_audio_avatar.addEventListener('mouseover', function () {
+        selected_audio_avatar_bg.style.display = 'flex'
+    });
+
+    selected_audio_avatar.addEventListener('mouseout', function () {
+        selected_audio_avatar_bg.style.display = 'none'
+    });
+
+    document.getElementById("voices-dropdown").onclick = function() {
         $(".voices").toggle()
     }
 
@@ -256,4 +310,5 @@ $(document).ready(function() {
         select_voice(this)
         $(".voices").hide()
     })
+
 })

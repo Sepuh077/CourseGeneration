@@ -59,15 +59,29 @@
     </div>
     <div class="background" style="display: none;">
         <div class="popup">
+            <button class="close-popup-icon">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
             <div class="popup-cnt">
                 <div class="voice-selection-cnt" data-id="">
-                    <button class="selected-voice" data-id="" id="selected-voice">
-                        <img class="selected-voice-img" src="">
-                        <div class="selected-voice-name"></div>
-                    </button>
+                    <div class="selected-voice" data-id="" id="selected-voice">
+                        <div class="selected-voice-info">
+                            <button class="selected-voice-img-cnt" id="selected-voice-img-cnt">
+                                <img class="selected-voice-img" src="">
+                                <div class="selected-voice-img-bg" id="selected-voice-img-bg">
+                                    <i class="fa-solid fa-play"></i>
+                                </div>
+                            </button>
+                            <div class="selected-voice-name"></div>
+                        </div>
+                        <button class="voices-dropdown" id="voices-dropdown">
+                            x
+                        </button>
+                    </div>
                     <div class="voices">
                     </div>
                 </div>
+
                 <button id="generate-video" data-name="Generate Video">
                     Generate video
                 </button>

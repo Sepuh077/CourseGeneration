@@ -4,6 +4,7 @@
 *.txt
 *.mp4
 *.sqlite3
+*.log
 
 test.ipynb
 
@@ -15,3 +16,4 @@ projects/
 venv/
 Wav2Lip/
 tortoise-tts/
+.vscode/

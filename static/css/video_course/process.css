@@ -103,13 +103,56 @@
 }
 
 .selected-voice {
-    height: 48px;
+    height: 64;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
 }
 
-.selected-voice > img {
-    height: 44px;
-    width: 44px;
+.selected-voice-info {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.selected-voice-img-cnt {
+    height: 64px;
+    width: 64px;
+    position: relative;
+    border: none;
     border-radius: 50%;
+    background: none;
+    padding: 0;
+}
+
+.selected-voice-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    padding: 0;
+}
+
+.selected-voice-img-bg {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    display: none;
+    font-size: 20px;
+}
+
+.selected-voice-img-cnt:hover {
+    opacity: 1;
+}
+
+.selected-voice-img-bg {
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .voices {
@@ -118,10 +161,10 @@
     overflow-y: auto;
     position: absolute;
     display: none;
-    top: 48px;
+    top: 64px;
 }
 
-.voice, .selected-voice {
+.voice {
     width: 100%;
     display: flex;
     align-items: center;
