@@ -50,7 +50,7 @@ class Audios(Elements):
         if os.path.exists(self[index]) and self.compare_voice_ids_by_index(index, voice_id) and self.compare_texts_by_index(index, text):
             return
 
-        text_to_speech(text, self[index], True, voice_id=voice_id)
+        text_to_speech(text, self[index], False, voice_id=voice_id)
         new_data = {
             "voice_id": voice_id,
             "text": text

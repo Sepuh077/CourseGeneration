@@ -16,7 +16,7 @@
         </a>
         <h2>{% trans 'Your video is ready!' %} 🎉</h2>
         <video controls class="video" height="512px">
-            <source src="{{video_path}}" type="video/mp4">
+            <source src="{{video_path}}?v={{ timestamp }}" type="video/mp4">
             {% trans 'Your browser does not support the video tag.' %}'
         </video>
         <a href="{{video_path}}" download class="download-button">
