@@ -10,8 +10,11 @@
 
 {% block content %}
 <div class="content">
-    <form method="POST" enctype="multipart/form-data">
-        <input name="name">
+    <form method="POST" enctype="multipart/form-data" class="upload-slides-form relative">
+        <div class="upload-document-title">
+            {% trans 'Upload your slides here' %}
+        </div>
+        <input name="name" class="upload-slides-name base-input" placeholder="{% trans 'Name (optional)' %}">
         <label for="upload-document-input" class="upload-document-container" id="upload-document-container">
             <div class="upload-document-container-2">
                 <div class="drag-drop-text">
@@ -26,7 +29,7 @@
                 <span id="file-upload-filename" class="file-upload-filename">{% trans 'No file chosen' %}</span>
             </div>
         </label>
-        <button type="submit">Submit</button>
+        <button type="submit" class="submit-slides-file disabled-button">{% trans 'Upload' %}</button>
     </form>
 </div>
 <script src="/static/js/video_course/upload.js"></script>
