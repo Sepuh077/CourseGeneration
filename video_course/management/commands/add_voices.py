@@ -10,15 +10,8 @@ from src.helper import text_to_speech
 
 class Command(BaseCommand):
     def handle(self, *args, **kwargs):
-        # response = requests.get("https://api.murf.ai/v1/speech/voices", headers={
-        #     "api-key": os.environ.get("MURF_API_KEY"),
-        # })
-
         avatar_url = "https://murf.ai/public-assets/home/avatars/{}.jpg"
 
-        # data = list(filter(lambda x: x['locale'].lower() == "en-us" and x["accent"] == "US & Canada", response.json()))
-        # with open("voices.json", "w") as f:
-        #     f.write(json.dumps(data))
         with open(os.path.join(settings.BASE_DIR, "video_course/data/voices.json"), "r") as f:
             data = json.loads(f.read())
         for voice in data:

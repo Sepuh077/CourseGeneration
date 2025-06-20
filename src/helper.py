@@ -53,12 +53,15 @@ def text_to_speech(text: str, audio_path: str, test: bool = False, raise_exc: bo
             if response.status_code == 200:
                 with open(audio_path, "wb") as f:
                     f.write(response.content)
+                    return True
         else:
             audio = gTTS(text)
             audio.save(audio_path)
+            return True
     except Exception as exc:
         if raise_exc:
             raise exc
+    return False
 
 
 def image_to_base64(img_path, format='jpeg'):

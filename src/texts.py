@@ -24,22 +24,30 @@ class Texts(Elements):
         for i in range(len(self.slides)):
             self.generate_text_for_slide(memory, i, send_msg=True)
     
-    def regenerate_text(self, index: int):
-        if index >= len(self):
-            raise IndexError("Index is out of range!")
+    def regenerate_text(self, index: int, force: bool = True):
+        if not force:
+            cur_text = self.get(index)
+            if cur_text:
+                return cur_text, True
+
         memory = ConversationSummaryMemory(llm=LLM, return_messages=True)
 
         for i in range(index):
-            self.generate_text_for_slide(memory, i)
-        return self.generate_text_for_slide(memory, index, overwrite=True)
+            self.add_memory(memory, i)
+        return self.generate_text_for_slide(memory, index, overwrite=True), False
+
+    def add_memory(self, memory: ConversationSummaryMemory, index: int):
+        text = self.get(index)
+        if text:
+            memory.chat_memory.add_ai_message(text)
     
     def generate_text_for_slide(self, memory: ConversationSummaryMemory, index: int, overwrite: bool = False, send_msg: bool = False):
         if os.path.exists(self[index]) and not overwrite:
             text = self.get(index)
             if text:
                 memory.chat_memory.add_ai_message(text)
-            if send_msg:
-                self.send_skip_msg(index)
+            # if send_msg:
+            #     self.send_skip_msg(index)
             return
 
         base64_str = self.slides.get_base64(index)
@@ -63,7 +71,7 @@ class Texts(Elements):
         try:
             response = LLM.invoke(full_chat)
         except Exception as exc:
-            self.send_error_msg(index)
+            # self.send_error_msg(index)
             raise exc
 
         memory.chat_memory.add_ai_message(response)
@@ -119,17 +127,22 @@ class Texts(Elements):
             raise TypeError("Provided data type must be list or str, but received {}".format(type(data)))
         
         for index, text in enumerate(data):
-            if text:
-                self.write(index, text)
+            self.write(index, text or '')
     
     def write(self, index: int, text: str, send_msg: bool = False):
         text = text.strip()
-        if send_msg:
-            self.send_message(text, index)
+        # if send_msg:
+        #     self.send_message(text, index)
         with open(self[index], "w") as file:
             file.write(text)
         
         return text
+    
+    def get_all_texts(self):
+        texts = []
+        for i in range(len(self.slides)):
+            texts.append(self.get(i))
+        return texts
 
     def get(self, index: int):
         if os.path.exists(self[index]):

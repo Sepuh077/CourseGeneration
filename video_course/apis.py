@@ -1,5 +1,6 @@
 from django.http.response import JsonResponse
 from django.urls import reverse
+
 import json
 
 from time import sleep
@@ -20,29 +21,17 @@ def get_voices(request):
     return JsonResponse({"voices": voices})
 
 
-def generate_texts(request, key: str):
+
+def regenerate_text(request, key: str, index: int):
     context = {}
     if request.method == "POST":
+        force = request.POST.get("force") in [True, 'true', 'True']
         data = json.loads(request.POST.get("data", []))
         vc = VC.objects.get(folder=key)
         video_course = VideoCourse(vc.folder, True)
         slides = Slides(video_course)
         texts = Texts(video_course, slides, data)
-        texts.generate_texts_for_slides()
-        vc.texts_created = True
-        vc.save()
-    
-    return JsonResponse(context)
-
-
-def regenerate_text(request, key: str, index: int):
-    context = {}
-    if request.method == "POST":
-        vc = VC.objects.get(folder=key)
-        video_course = VideoCourse(vc.folder, True)
-        slides = Slides(video_course)
-        texts = Texts(video_course, slides)
-        context["text"] = texts.regenerate_text(index)
+        context["text"], context["skipped"] = texts.regenerate_text(index, force)
         vc.texts_created = True
         vc.save()
     
@@ -57,8 +46,6 @@ def update_texts(request, key: str):
         video_course = VideoCourse(vc.folder, True)
         slides = Slides(video_course)
         Texts(video_course, slides, data)
-        vc.texts_created = True
-        vc.save()
     
     return JsonResponse(context)
 
@@ -77,11 +64,9 @@ def generate_video(request, key: str):
         slides = Slides(video_course)
         texts = Texts(video_course, slides, data)
         audios = Audios(video_course, texts, voice_id)
-        
-        vc.audios_created = True
-        vc.save()
-
         video_course.process(slides, audios)
+
+        vc.create_video()
 
         context["link"] = reverse("show-video", kwargs={"key": key})
     

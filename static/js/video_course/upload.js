@@ -8,7 +8,7 @@ $(document).ready(function() {
             if (files.length > 0) {
                 let file_name = files[0].name
                 file_name_cnt.textContent = file_name
-                $('.upload-document-btn').removeClass('disabled-button')
+                $('.submit-slides-file').removeClass('disabled-button')
             }
         }
 

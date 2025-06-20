@@ -1,0 +1,99 @@
+.video-cnt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    max-width: calc(100% - 64px);
+}
+
+.video-part {
+    border-radius: 16px;
+    padding: 8px;
+    background-color: #412863;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 100%;
+    width: 1024px;
+    max-height: 512px;
+    overflow: hidden;
+}
+
+.video {
+    border-radius: 12px;
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+}
+
+.download-button {
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background-color: #412863;
+}
+
+.download-button:hover {
+    opacity: 0.9;
+}
+
+.rate-video {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+}
+
+.rate-title {
+    font-size: 14px;
+    color: #444;
+}
+
+.user-opinion {
+    background-color: #ddd;
+    padding: 16px 8px;
+    border-radius: 16px;
+    display: flex;
+    gap: 32px;
+}
+
+.review-title {
+    padding: 8px;
+}
+
+.review-input {
+    width: 100%;
+    border: none;
+    background-color: #eee;
+    padding: 8px;
+    resize: none;
+    border-radius: 8px;
+    max-height: 256px;
+}
+
+.review-submit-btn-cnt {
+    padding-top: 16px;
+    text-align: center;
+}
+
+.edit-video-btn {
+    position: absolute;
+    top: 4px;
+    right: 0px;
+    height: 28px;
+    width: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    font-size: 16px;
+    z-index: 6;
+    border: 1px solid #412863;
+    color: #412863;
+    border-radius: 4px;
+    transition: 0.2s;
+}
+
+.back-to-drafts-btn:hover {
+    background-color: rgb(233, 231, 252);
+}

@@ -11,53 +11,64 @@
 
 {% block content %}
 <div class="content">
-    <div class="slides">
-        {% for element in data %}
-        <div class="slide" data-number="{{forloop.counter}}">
-            <div class="slide-img">
-                <img src="{{element.image}}">
-            </div>
-            <div class="slide-text">
-                <textarea class="slide-textarea" rows="10">{{element.text}}</textarea>
-                <div class="slide-characters">
-                    <span class="characters-count"></span>
-                    /
-                    <span class="characters-max-count"></span>
+    <div class="slides-process-cnt relative">
+        <div class="slide-process-title">
+            <h2>{{title}}</h2>
+        </div>
+        <div class="slides">
+            {% for element in data %}
+            <div class="slide" data-number="{{forloop.counter}}">
+                <div class="slide-img">
+                    <img src="{{element.image}}">
                 </div>
-                <div class="slide-actions">
-                    <button class="regenerate-btn" data-name="Regenerate" {% if not texts_created %} style="display: none;" {% endif %}>
-                        <i class="fa-solid fa-rotate"></i>
-                    </button>
-                    <div class="slide-generation-infos">
-                        <button class="generate-error slide-generation-info" data-name="Something went wrong!" style="display: none;">
-                            <i class="fa-solid fa-circle-exclamation" style="color: #ff0000;"></i>
+                <div class="slide-text">
+                    <textarea class="slide-textarea" rows="10">{{element.text}}</textarea>
+                    <div class="slide-characters">
+                        <span class="characters-count"></span>
+                        /
+                        <span class="characters-max-count"></span>
+                    </div>
+                    <div class="slide-actions">
+                        <button class="regenerate-btn" data-name="{% trans 'Regenerate' %}">
+                            <i class="fa-solid fa-rotate"></i>
                         </button>
-                        <button class="generate-skip slide-generation-info" data-name="Skipped!" style="display: none;">
-                            <i class="fa-solid fa-circle-chevron-right" style="color: #74C0FC;"></i>
-                        </button>
-                        <button class="generate-done slide-generation-info" data-name="Done!" style="display: none;">
-                            <i class="fa-solid fa-circle-check" style="color: #00ff00;"></i>
-                        </button>
+                        <div class="slide-generation-infos">
+                            <button class="generate-error slide-generation-info" data-name="{% trans 'Something went wrong!' %}" style="display: none;">
+                                <i class="fa-solid fa-circle-exclamation" style="color: #ff0000;"></i>
+                            </button>
+                            <button class="generate-skip slide-generation-info" data-name="{% trans 'Skipped!' %}" style="display: none;">
+                                <i class="fa-solid fa-circle-chevron-right" style="color: #74C0FC;"></i>
+                            </button>
+                            <button class="generate-done slide-generation-info" data-name="{% trans 'Done!' %}" style="display: none;">
+                                <i class="fa-solid fa-circle-check" style="color: #00ff00;"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+        <div class="process-buttons">
+            <button id="generate-texts">
+                {% trans 'Generate texts' %}
+            </button>
+            <button id="update-texts">
+                {% trans 'Save draft' %}
+            </button>
+            <button id="choose-voice">
+                {% trans 'Choose voice' %}
+            </button>
+        </div>
+        <div class="info-messages">
+            <div class="draft-saved request-success" id="draft-saved">
+                {% trans 'Saved successfully!' %}
+            </div>
+            <div class="draft-not-saved request-error" id="draft-not-saved">
+                {% trans 'Oops, glitch!' %}
+            </div>
+        </div>
     </div>
-    {% if not texts_created %}
-    <button id="generate-texts" data-name="Generate Texts">
-        Generate texts
-    </button>
-    {% endif %}
-    <div class="second-step-buttons" {% if not texts_created %} style="display: none;" {% endif %}>
-        <button id="update-texts" data-name="Update Texts">
-            Update texts
-        </button>
-        <button id="choose-voice" data-name="Choose Voice">
-            Choose voice
-        </button>
-    </div>
-    <div class="background" style="display: none;">
+    <div class="blur-background hidden">
         <div class="popup">
             <button class="close-popup-icon">
                 <i class="fa-solid fa-xmark"></i>
@@ -75,16 +86,25 @@
                             <div class="selected-voice-name"></div>
                         </div>
                         <button class="voices-dropdown" id="voices-dropdown">
-                            x
+                            <i class="fa-solid fa-chevron-left"></i>
                         </button>
                     </div>
-                    <div class="voices">
+                    <div class="voices" id="voices">
                     </div>
                 </div>
 
-                <button id="generate-video" data-name="Generate Video">
-                    Generate video
+                <button id="generate-video" class="generate-video" data-name="{% trans 'Generate Video' %}">
+                    <i class="fa-solid fa-file-video"></i>
                 </button>
+            </div>
+            <div class="generate-video-loading-cnt" id="generate-video-loading-cnt">
+                <div class="generate-video-loading">
+                    <div class="generate-video-loading-bar"></div>
+                </div>
+            </div>
+            <div class="generate-video-error" id="generate-video-error">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                Something went wrong!
             </div>
         </div>
     </div>

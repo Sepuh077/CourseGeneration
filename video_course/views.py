@@ -19,7 +19,6 @@ def upload_slides(request):
             folder=video_course.folder_name
         )
         Slides(video_course, document.read())
-        vc.images_created = True
         vc.save()
 
         return redirect('process', key=vc.folder)
@@ -47,10 +46,8 @@ def process_video_course(request, key):
                 'text': texts.get(i)
             })
 
-        context['images_created'] = vc.images_created
-        context['texts_created'] = vc.texts_created
-        context['audio_created'] = vc.audios_created
         context['video_path'] = vc.get_video_path()
+        context['title'] = vc.title
 
     return render(request, "video_course/process.html", context=context)
 
@@ -63,5 +60,6 @@ def show_video(request, key):
         context['video_path'] = vc.get_video_path()
         if not context['video_path']:
             raise Http404("Page not found!")
+        context['key'] = key
 
     return render(request, "video_course/video.html", context=context)

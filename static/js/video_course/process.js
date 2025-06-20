@@ -3,9 +3,15 @@ $(document).ready(function() {
     const selected_audio_avatar_bg = document.getElementById("selected-voice-img-bg")
     const selected_audio_avatar = document.getElementById("selected-voice-img-cnt")
     const selected_audio_play_icon = selected_audio_avatar_bg.querySelector("i")
+    const generate_texts = document.getElementById("generate-texts")
+    const voices_cnt = document.getElementById("voices")
+    const voices_dropdown = document.getElementById("voices-dropdown")
+    const generate_video_loading_cnt = document.getElementById("generate-video-loading-cnt")
+    const draft_saved_msg = $('#draft-saved')
+    const draft_not_saved_msg = $('#draft-not-saved')
     let parts = window.location.href.split('/')
     const roomName = parts[parts.length - 2]
-    const typingSpeed = 40;
+    const typingSpeed = 15;
     const element_rotate_loading_class = "element-rotate-loading"
     const disabled = "disabled"
     let start_generation = false
@@ -13,13 +19,13 @@ $(document).ready(function() {
 
     let audio
 
-    const chatSocket = new WebSocket(
-        'ws://'
-        + window.location.host
-        + '/ws/process/'
-        + roomName
-        + '/'
-    );
+    // const chatSocket = new WebSocket(
+    //     'ws://'
+    //     + window.location.host
+    //     + '/ws/process/'
+    //     + roomName
+    //     + '/'
+    // );
 
     function type_characters(element, text) {
         let index = 0;
@@ -35,23 +41,23 @@ $(document).ready(function() {
         type_character()
     }
 
-    chatSocket.onmessage = function(e) {
-        const data = JSON.parse(e.data)
+    // chatSocket.onmessage = function(e) {
+    //     const data = JSON.parse(e.data)
 
-        let index = data.slide
-        let cnt = document.querySelectorAll('.slide-text')[index]
+    //     let index = data.slide
+    //     let cnt = document.querySelectorAll('.slide-text')[index]
         
-        let text = data.message
+    //     let text = data.message
         
-        if(text) {
-            let textarea = cnt.querySelector(".slide-textarea")
+    //     if(text) {
+    //         let textarea = cnt.querySelector(".slide-textarea")
 
-            type_characters(textarea, text)
-        }
-        show_generate_info(cnt, data.skip, data.error)
-        show_regenerate_button(cnt)
-        sent_msg = true
-    };
+    //         type_characters(textarea, text)
+    //     }
+    //     show_generate_info(cnt, data.skip, data.error)
+    //     show_regenerate_button(cnt)
+    //     sent_msg = true
+    // };
 
     function hide_generate_infos(element) {
         element.querySelectorAll('.slide-generation-info').forEach(e => {
@@ -74,40 +80,66 @@ $(document).ready(function() {
 
     const CHARACTERS_MAX_COUNT = 800
 
+    function regenerate_text(index, force = true, for_all = false) {
+        let element = document.querySelectorAll('.slide-text')[index]
+        if(!element) {
+            generate_texts.classList.remove(disabled)
+            return
+        }
+        generate_texts.classList.add(disabled)
+        let btn = element.querySelector('.regenerate-btn')
+        let icon = btn.querySelector('i')
+        hide_generate_infos(element)
+        btn.classList.add(disabled)
+        icon.classList.add(element_rotate_loading_class)
+
+        $.ajax({
+            method: "POST",
+            type: "POST",
+            url: `regenerate-text-${index}/`,
+            data: {
+                "csrfmiddlewaretoken": CSRF,
+                "force": force,
+                "data": (for_all && index == 0) ? JSON.stringify(get_texts()) : "[]"
+            },
+            success: function(response) {
+                let skipped = response.skipped
+                if(!skipped) {
+                    type_characters(element.querySelector("textarea"), response.text)
+                }
+                show_generate_info(element, skipped, false)
+                if(for_all) {
+                    regenerate_text(index + 1, force, for_all)
+                }
+                else {
+                    generate_texts.classList.remove(disabled)
+                }
+            },
+            error: function(response) {
+                show_generate_info(element, false, true)
+                generate_texts.classList.remove(disabled)
+            },
+            complete: function() {
+                btn.classList.remove(disabled)
+                icon.classList.remove(element_rotate_loading_class)
+            }
+        })
+    }
+
     document.querySelectorAll('.slide-text').forEach((element, index) => {
         $(element.querySelector('.regenerate-btn')).on('click', function() {
-            let btn = this
-            let icon = btn.querySelector('i')
-            hide_generate_infos(element)
-            btn.classList.add(disabled)
-            icon.classList.add(element_rotate_loading_class)
-
-            $.ajax({
-                method: "POST",
-                type: "POST",
-                url: `regenerate-text-${index}/`,
-                data: {
-                    "csrfmiddlewaretoken": CSRF,
-                },
-                success: function(response) {
-                    type_characters(element.querySelector("textarea"), response.text)
-                    show_generate_info(element, false, false)
-                },
-                error: function(response) {
-                    show_generate_info(element, false, true)
-                },
-                complete: function() {
-                    btn.classList.remove(disabled)
-                    icon.classList.remove(element_rotate_loading_class)
-                }
-            })
+            regenerate_text(index, true)
         })
     });
 
-    function show_regenerate_button(element) {
-        let regenerate_btn = element.querySelector('.regenerate-btn')
-        regenerate_btn.style.display = "block"
+    generate_texts.onclick = function() {
+        regenerate_text(0, false, true)
     }
+
+    // function show_regenerate_button(element) {
+    //     let regenerate_btn = element.querySelector('.regenerate-btn')
+    //     regenerate_btn.style.display = "block"
+    // }
 
     function set_element_character_count(element) {
         let text = element.querySelector("textarea").value
@@ -115,9 +147,9 @@ $(document).ready(function() {
         element.querySelector(".characters-count").textContent = text.length
         element.querySelector(".characters-max-count").textContent = CHARACTERS_MAX_COUNT
 
-        if(text.length > 0) {
-            show_regenerate_button(element)
-        }
+        // if(text.length > 0) {
+        //     show_regenerate_button(element)
+        // }
     }
 
     function set_all_character_counts() {
@@ -137,39 +169,41 @@ $(document).ready(function() {
         this.parentNode.querySelector(".characters-max-count").textContent = CHARACTERS_MAX_COUNT
     })
 
-    $('#generate-texts').on('click', function() {
-        start_generation = true
-        sent_msg = false
-        this.classList.add(disabled)
-        let element = this
-        $.ajax({
-            method: "POST",
-            type: "POST",
-            url: "generate-texts/",
-            data: {
-                "csrfmiddlewaretoken": CSRF,
-                "data": JSON.stringify(get_texts())
-            },
-            success: function() {
-                $('.second-step-buttons').show()
-                $(element).hide()
-                if(!sent_msg) {
-                    location.reload()
-                }
-            },
-            error: function() {
+    // $('#generate-texts').on('click', function() {
+    //     start_generation = true
+    //     sent_msg = false
+    //     this.classList.add(disabled)
+    //     let element = this
+    //     $.ajax({
+    //         method: "POST",
+    //         type: "POST",
+    //         url: "generate-texts/",
+    //         data: {
+    //             "csrfmiddlewaretoken": CSRF,
+    //             "data": JSON.stringify(get_texts())
+    //         },
+    //         success: function() {
+    //             $('.second-step-buttons').show()
+    //             $(element).hide()
+    //             if(!sent_msg) {
+    //                 location.reload()
+    //             }
+    //         },
+    //         error: function() {
 
-            },
-            complete: function() {
-                element.classList.remove(disabled)
-            }
-        })
-    })
+    //         },
+    //         complete: function() {
+    //             element.classList.remove(disabled)
+    //         }
+    //     })
+    // })
 
     $('#generate-video').on('click', function() {
         let btn = this
         btn.classList.add(disabled)
         let voice_id = selected_voice.getAttribute("data-id")
+        generate_video_loading_cnt.style.display = "block"
+        generate_video_loading_cnt.querySelector(".generate-video-loading-bar").classList.add("start-loading")
         $.ajax({
             method: "POST",
             type: "POST",
@@ -184,13 +218,24 @@ $(document).ready(function() {
                     window.location.href = response.link
                 }
             },
+            error: function() {
+                let err = document.getElementById("generate-video-error")
+                err.style.display = "flex"
+                setTimeout(() => {
+                    err.style.display = "none"
+                }, 5000);
+            },
             complete: function() {
                 btn.classList.remove(disabled)
+                generate_video_loading_cnt.style.display = "none"
+                generate_video_loading_cnt.querySelector(".generate-video-loading-bar").classList.remove("start-loading")
             }
         })
     })
 
     $('#update-texts').on('click', function() {
+        let element = this;
+        element.classList.add(disabled)
         $.ajax({
             method: "POST",
             type: "POST",
@@ -199,13 +244,27 @@ $(document).ready(function() {
                 "csrfmiddlewaretoken": CSRF,
                 "data": JSON.stringify(get_texts())
             },
+            success: function() {
+                draft_saved_msg.fadeIn(200).delay(1000).fadeOut(200)
+            },
+            error: function() {
+                draft_not_saved_msg.fadeIn(200).delay(1000).fadeOut(200)
+            },
             complete: function() {
-                // location.reload();
+                element.classList.remove(disabled)
             }
         })
     })
 
-    $("#choose-voice").on("click", open_popup)
+    $("#choose-voice").on("click", function() {
+        let texts = get_texts()
+        for(let i = 0; i < texts.length; ++i) {
+            if(texts[i].trim()) {
+                open_popup()
+                return
+            }
+        }
+    })
     $('.close-popup-icon').on("click", close_popup)
 
     function get_texts() {
@@ -218,7 +277,6 @@ $(document).ready(function() {
             type: "GET",
             url: "/get-voices/",
             success: function(response) {
-                let voicesContainer = document.querySelector('.voices')
                 response.voices.forEach((voice, index) => {
                     let button = document.createElement('button')
                     button.className = 'voice'
@@ -234,7 +292,7 @@ $(document).ready(function() {
 
                     button.appendChild(img)
                     button.appendChild(nameDiv)
-                    voicesContainer.appendChild(button)
+                    voices_cnt.appendChild(button)
 
                     if(index == 0) {
                         select_voice(button)
@@ -302,13 +360,21 @@ $(document).ready(function() {
         selected_audio_avatar_bg.style.display = 'none'
     });
 
-    document.getElementById("voices-dropdown").onclick = function() {
-        $(".voices").toggle()
+    voices_dropdown.onclick = function() {
+        if($(voices_cnt).is(":hidden")) {
+            voices_cnt.style.display = "flex"
+            voices_dropdown.classList.add("rotate_90deg")
+        }
+        else {
+            voices_cnt.style.display = "none"
+            voices_dropdown.classList.remove("rotate_90deg")
+        }
     }
 
     $(document).on("click", ".voice", function() {
         select_voice(this)
-        $(".voices").hide()
+        voices_cnt.style.display = "none"
+        voices_dropdown.classList.remove("rotate_90deg")
     })
 
 })

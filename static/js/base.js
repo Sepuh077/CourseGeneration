@@ -1,19 +1,14 @@
-const background = document.querySelector(".background")
-const body = document.querySelector("#body")
+const popupBackground = document.getElementsByClassName('blur-background')[0]
+const body = document.getElementById('body')
 
 function open_popup() {
-    if(background) {
-        background.style.display = "flex"
-        body.style.overflow = "hidden"
-        background.style.top = window.scrollY + "px"
-    }
+    popupBackground.classList.remove('hidden');
+    body.style.overflowY = 'hidden'
 }
 
 function close_popup() {
-    if(background) {
-        background.style.display = "none"
-        body.style.overflow = "auto"
-    }
+    popupBackground.classList.add('hidden');
+    body.style.overflowY = 'auto'
 }
 
 $(document).ready(function() {

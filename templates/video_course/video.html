@@ -5,17 +5,23 @@
 {% endblock title %}
 
 {% block head %}
-<link rel="stylesheet" href="/static/css/video_course/upload.css">
+<link rel="stylesheet" href="/static/css/video_course/video.css">
 {% endblock head %}
 
 {% block content %}
 <div class="content">
-    <video width="640" height="360" controls>
-        <source src="{{video_path}}" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-    <a href="{{video_path}}" download>
-        <button>Download Video</button>
-    </a>
+    <div class="video-cnt relative">
+        <a class="edit-video-btn" href="{% url 'process' key=key %}" data-name="{% trans 'Edit' %}">
+            <i class="fa-solid fa-pencil"></i>
+        </a>
+        <h2>{% trans 'Your video is ready!' %} 🎉</h2>
+        <video controls class="video" width="100%" height="100%">
+            <source src="{{video_path}}" type="video/mp4">
+            {% trans 'Your browser does not support the video tag.' %}'
+        </video>
+        <a href="{{video_path}}" download class="download-button">
+            {% trans 'Download Video' %}
+        </a>
+    </div>
 </div>
 {% endblock content %}
