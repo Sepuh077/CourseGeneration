@@ -25,6 +25,17 @@
 </head>
 
 <body id="body">
+    <div class="header">
+        <a class="header-title" href="{% url 'upload' %}">
+            <img src="/static/logo.webp">
+            <h2 class="header-name">
+                Slide Checkmate
+            </h2>
+        </a>
+        <h5 class="header-secondary">
+            Powered by Skill Checkmate
+        </h5>
+    </div>
     {% block content %}
     {% endblock content %}
     <div id="tooltip" class="tooltip"></div>

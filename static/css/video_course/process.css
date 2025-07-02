@@ -308,7 +308,7 @@ button {
 }
 
 .start-loading {
-    animation: loading-bar 20s linear;
+    animation: loading-bar 30s linear;
 }
 
 @keyframes loading-bar {

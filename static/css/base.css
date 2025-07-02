@@ -8,6 +8,35 @@
 body {
     display: flex;
     justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.header {
+    margin-top: 32px;
+}
+
+.header-title {
+    font-size: 32px;
+    color: #412863;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.header-title > img {
+    height: 36px;
+    width: 36px;
+}
+
+.header-secondary {
+    font-weight: 100;
+    color: #7B3CDB !important;
+    width: 100%;
+    text-align: end;
 }
 
 a {
@@ -22,7 +51,6 @@ a {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
     width: calc(100% - 32px);
 }
 
